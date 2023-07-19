@@ -104,4 +104,36 @@ for (let i = 0; i < parsedFiles.length; i += 1) {
   mergeRelations(json.relations);
 }
 
+function sort(a, b) {
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return 0;
+}
+
+result.collections.sort((a, b) => {
+  return sort(a.collection, b.collection);
+});
+result.fields.sort((a, b) => {
+  const collectionComparison = sort(a.collection, b.collection);
+  if (collectionComparison === 0) {
+    return sort(a.field, b.field);
+  }
+  return collectionComparison;
+});
+result.relations.sort((a, b) => {
+  const collectionComparison = sort(a.collection, b.collection);
+  if (collectionComparison === 0) {
+    const fieldComparison = sort(a.field, b.field);
+    if (fieldComparison === 0) {
+      return sort(a.related_collection, b.related_collection);
+    }
+    return fieldComparison;
+  }
+  return collectionComparison;
+});
+
 fs.writeFileSync(outputFile, yaml.stringify(result), 'utf-8');
