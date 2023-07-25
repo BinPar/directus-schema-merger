@@ -2,12 +2,17 @@
 
 const fs = require('fs');
 const yaml = require('yaml');
+const jsYaml = require('js-yaml');
 
 const inputFiles = process.argv.slice(2);
 const outputFile = inputFiles.pop();
 
+const shouldRemoveRowId = !!process.env.REMOVE_ROWID;
+
 console.log(
-  `Input files: ${inputFiles.join(', ')}\nOutput file: ${outputFile}`,
+  `Input files: ${inputFiles.join(
+    ', ',
+  )}\nOutput file: ${outputFile}\nRemove rowid: ${shouldRemoveRowId}`,
 );
 
 if (inputFiles.length < 2) {
@@ -44,6 +49,9 @@ function mergeCollections(newCollectionsArray) {
 }
 
 function mergeField(newField) {
+  if (shouldRemoveRowId && newField.field === 'rowid') {
+    return;
+  }
   if (newField && newField.collection && newField.field) {
     const previousFieldIndex = result.fields.findIndex(
       (field) =>
@@ -136,4 +144,5 @@ result.relations.sort((a, b) => {
   return collectionComparison;
 });
 
-fs.writeFileSync(outputFile, yaml.stringify(result), 'utf-8');
+// fs.writeFileSync(outputFile, yaml.stringify(result, {singleQuote: true}), 'utf-8');
+fs.writeFileSync(outputFile, jsYaml.dump(result), 'utf-8');
