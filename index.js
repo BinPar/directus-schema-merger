@@ -24,7 +24,7 @@ const parsedFiles = inputFiles.map((file) =>
   yaml.parse(fs.readFileSync(file, 'utf-8')),
 );
 
-const result = { collections: [], fields: [], relations: [] };
+const result = { version: 1, directus: '12.0.3', vendor: 'postgres', collections: [], fields: [], relations: [] };
 
 function mergeCollection(newCollection) {
   if (newCollection && newCollection.collection) {
@@ -79,8 +79,7 @@ function mergeRelation(newRelation) {
   if (
     newRelation &&
     newRelation.collection &&
-    newRelation.field &&
-    newRelation.related_collection
+    newRelation.field
   ) {
     const previousRelationIndex = result.relations.findIndex(
       (relation) =>
